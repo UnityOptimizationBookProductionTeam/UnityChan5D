@@ -1,8 +1,11 @@
 fileFormatVersion: 2
-guid: 6cfb46043d4584749b4fc089b84b54fb
+guid: dc7f8430e19d844dc8460fa5c199caba
+labels:
+- Unitychan
+- 2d
 folderAsset: yes
-timeCreated: 1508798772
-licenseType: Free
+timeCreated: 1452599573
+licenseType: Pro
 DefaultImporter:
   userData: 
   assetBundleName: 
