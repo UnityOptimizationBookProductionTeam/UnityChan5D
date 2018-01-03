@@ -11,7 +11,7 @@ namespace Gesture {
         public bool longTap {
             get {
                 return _longTap;
-        }
+            }
             set {
                 _longTap = value;
             }
@@ -33,33 +33,36 @@ namespace Gesture {
         }
 
         public override void Destroy() {
+            base.Destroy();
             // 明示的に登録を削除する.
             GestureManager.instance.RemoveLongTap(this);
         }
 
         public override void SetTouch(ref Touch touch, int count, float deltaTime) {
             // 無効指定されているなら処理しない.
-            // 2本指のタッチがあった時点で処理しない.
-            if (!_enabled || count > 0) {
+            if (!_enabled) {
                 return;
             }
 
-            TouchPhase phase = touch.phase;
+            var phase = touch.phase;
+            var id = touch.fingerId;
 
             // Beganで初期化.
             if (phase == TouchPhase.Began) {
+                _fingerId = id;
                 _startPos = touch.position;
                 _timer = 0.0f;
                 _longTap = false;
             }
 
             // ロングタップコールバックを行っておらず移動がステイなら.
-            if (!_longTap && (phase == TouchPhase.Moved || phase == TouchPhase.Stationary)) {
-                Vector2 now = touch.position;
-                Vector2 diffPos = new Vector2(now.x - _startPos.x, now.y - _startPos.y);
+            if (id == _fingerId && !_longTap && (phase == TouchPhase.Moved || phase == TouchPhase.Stationary)) {
+                var now = touch.position;
+                var diffPos = new Vector2(now.x - _startPos.x, now.y - _startPos.y);
 
                 if (Check(diffPos, _timer)) {
                     _longTap = true;
+                    _fingerId = InvalidFingerId;
                     _position = touch.position;
                     _callback();
                 }

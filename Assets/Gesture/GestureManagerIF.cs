@@ -139,5 +139,27 @@ namespace Gesture {
 
             return _listPinch.Remove(pinch);
         }
+
+        public bool AddPhase(GesturePhase phase) {
+            if (phase == null) {
+                return false;
+            }
+
+            if (_listPhase == null) {
+                _listPhase = new List<GesturePhase>();
+            }
+
+            _listPhase.Add(phase);
+
+            return true;
+        }
+
+        public bool RemovePhase(GesturePhase phase) {
+            if (phase == null || _listPhase == null) {
+                return false;
+            }
+
+            return _listPhase.Remove(phase);
+        }
     }
 }

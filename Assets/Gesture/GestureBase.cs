@@ -5,6 +5,8 @@ namespace Gesture {
     public abstract class GestureBase {
         // 全てのGestureで使用する変数(意味はGesture毎に違う).
         // Gesture固有の変数は継承先で宣言する.
+        protected const int InvalidFingerId = -1;
+
         protected UnityAction _callback;
 
 #if UNITY_EDITOR
@@ -70,6 +72,8 @@ namespace Gesture {
 
         protected float _timer;
 
+        protected int _fingerId = InvalidFingerId;
+
         protected bool _enabled; // 外部からの有効無効を設定する.
 
         public virtual bool enabled {
@@ -81,7 +85,10 @@ namespace Gesture {
             }
         }
 
-        public abstract void Destroy();
+        public virtual void Destroy() {
+            _callback = null;
+        }
+
         public abstract void SetTouch(ref Touch touch, int count, float deltaTime);
     }
 }

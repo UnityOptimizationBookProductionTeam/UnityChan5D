@@ -36,6 +36,7 @@ namespace Gesture {
         }
 
         public override void Destroy() {
+            base.Destroy();
             // 明示的に登録を削除する.
             GestureManager.instance.RemovePinch(this);
         }
@@ -52,14 +53,14 @@ namespace Gesture {
                 _firstLastPos = _firstPos - touch.deltaPosition; // 前回の座標.
             }
             else {
-                Vector2 pos = touch.position;
-                Vector2 delta = touch.deltaPosition;
-                Vector2 nowLastPos = pos - delta; // 前回の座標.
+                var pos = touch.position;
+                var delta = touch.deltaPosition;
+                var nowLastPos = pos - delta; // 前回の座標.
                 // 前回と今回で2点間の同時のベクトルを求める.
-                Vector2 last = nowLastPos - _firstLastPos;
-                Vector2 now = pos - _firstPos;
-                float sqrLast = last.sqrMagnitude;
-                float sqrNow = now.sqrMagnitude;
+                var last = nowLastPos - _firstLastPos;
+                var now = pos - _firstPos;
+                var sqrLast = last.sqrMagnitude;
+                var sqrNow = now.sqrMagnitude;
 
                 // 大きさを比べる.
                 if (sqrLast > sqrNow) {

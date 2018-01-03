@@ -38,24 +38,21 @@ namespace Gesture {
             get {
                 return _stationary;
             }
-            set {
-                _stationary = value;
-            }
         }
 
         private bool _swipe;
 
-#if UNITY_EDITOR
-        // UnityEditor時シミュレート用.
         public bool swipe {
             get {
                 return _swipe;
             }
+#if UNITY_EDITOR
+            // UnityEditor時シミュレート用.
             set {
                 _swipe = value;
             }
-        }
 #endif
+        }
 
         public GestureSwipe(UnityAction callback, float time = 0.0f, float threshold = 50.0f, bool stationary = false) {
             Assert.IsNotNull(callback, "GestureSwipe : callback is null");
@@ -73,40 +70,50 @@ namespace Gesture {
         }
 
         public override void Destroy() {
+            base.Destroy();
             // 明示的に登録を削除する.
             GestureManager.instance.RemoveSwipe(this);
         }
 
         public override void SetTouch(ref Touch touch, int count, float deltaTime) {
             // 無効指定されているなら処理しない.
-            // 2本指のタッチがあった時点で処理しない.
-            if (!_enabled || count > 0) {
+            if (!_enabled) {
                 return;
             }
 
-            TouchPhase phase = touch.phase;
+            var phase = touch.phase;
+            var id = touch.fingerId;
 
             if (phase == TouchPhase.Began) {
+                _fingerId = id;
                 _startPos = touch.position;
                 _swipe = false;
+                _end = false;
             }
 
-            if (phase == TouchPhase.Moved || phase == TouchPhase.Stationary ||
+            if (id == _fingerId) {
+                if (phase == TouchPhase.Moved || phase == TouchPhase.Stationary ||
                 phase == TouchPhase.Ended || phase == TouchPhase.Canceled) {
 
-                if (!_stationary && phase == TouchPhase.Stationary) {
-                    return;
-                } 
+                    if (phase == TouchPhase.Stationary && !_stationary) {
+                        return;
+                    }
 
-                Vector2 now = touch.position;
-                Vector2 diffPos = new Vector2(now.x - _startPos.x, now.y - _startPos.y);
+                    var now = touch.position;
+                    var diffPos = new Vector2(now.x - _startPos.x, now.y - _startPos.y);
 
-                if (Check(diffPos)) {
-                    _position = touch.position;
-                    _deltaPos = touch.deltaPosition;
-                    _end = (phase == TouchPhase.Ended || phase == TouchPhase.Canceled) ? true : false;
+                    if (Check(diffPos)) {
+                        _position = now;
+                        _deltaPos = touch.deltaPosition;
 
-                    _callback();
+                        if (phase == TouchPhase.Ended || phase == TouchPhase.Canceled) {
+                            _fingerId = InvalidFingerId;
+                            _swipe = false;
+                            _end = true;
+                        }
+
+                        _callback();
+                    }
                 }
             }
         }
