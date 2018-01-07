@@ -1,0 +1,6 @@
+[submodule "assetbundlegraphtool"]
+	path = assetbundlegraphtool
+	url = https://bitbucket.org/Unity-Technologies/assetbundlegraphtool.git
+[submodule "Assets/assetbundlegraphtool"]
+	path = Assets/assetbundlegraphtool
+	url = https://bitbucket.org/Unity-Technologies/assetbundlegraphtool.git
