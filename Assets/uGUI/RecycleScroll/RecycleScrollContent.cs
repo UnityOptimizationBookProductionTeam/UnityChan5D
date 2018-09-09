@@ -28,6 +28,9 @@ namespace uGUI {
         [SerializeField, TooltipAttribute("セル(スクロールリスト)の総数")]
         private int _cellNum;
 
+        [SerializeField, TooltipAttribute("セル間のスペーシングサイズ")]
+        private float _spacingSize;
+
         private int _cellInstanceNum; // 内部で使用するリサイクル用のインスタンス化するセル数.
 
         private int _currentCellIndex; // 見えているセルの先頭インデックス値(スクロールにより可変).
@@ -57,21 +60,24 @@ namespace uGUI {
             // cellのサイズと数からコンテンツ領域のサイズを算出.
             var contentSize = _content.sizeDelta;
             var cellSize = _cell.sizeDelta;
+            var cellRange = 0.0f;
 
             if (_isVertical) {
                 _cellSize = cellSize.y;
-                contentSize.y = _cellSize * _cellNum;
+                cellRange = _cellSize + _spacingSize;
+                contentSize.y = cellRange * _cellNum;
             }
             else {
                 _cellSize = cellSize.x;
-                contentSize.x = _cellSize * _cellNum;
+                cellRange = _cellSize + _spacingSize;
+                contentSize.x = cellRange * _cellNum;
             }
 
             // ScrollRectを機能させるためにコンテンツ領域(スクロール)サイズをセットする.
             _content.sizeDelta = contentSize;
 
             // viewportで見えているセルの数.
-            var visibleNum = Mathf.CeilToInt(_viewportSize / _cellSize);
+            var visibleNum = Mathf.CeilToInt(_viewportSize / cellRange);
 
             // viewportのサイズからcellのInstantiateを行う(見えている数 +2がリサイクルするには必要).
             _cellInstanceNum = visibleNum + 2;
@@ -90,7 +96,7 @@ namespace uGUI {
                 var gameObject = clone.gameObject;
 
                 gameObject.SetActive(true);
-                clone.anchoredPosition = _isVertical ? new Vector2(0.0f, -_cellSize * i) : new Vector2(_cellSize * i, 0.0f);
+                clone.anchoredPosition = _isVertical ? new Vector2(0.0f, -cellRange * i) : new Vector2(cellRange * i, 0.0f);
                 _cellList.AddLast(clone);
 
                 // セルの初期化処理.
@@ -110,9 +116,10 @@ namespace uGUI {
             var now = _content.anchoredPosition;
             var pos = _isVertical ? now.y : -now.x;
             var cellIndex = 0;
+            var cellRange = _cellSize + _spacingSize;
 
             if (pos > 0.0f) {
-                cellIndex = Mathf.FloorToInt(pos / _cellSize);
+                cellIndex = Mathf.FloorToInt(pos / cellRange);
 
                 if (cellIndex > _lastCellIndex) {
                     cellIndex = _lastCellIndex;
@@ -131,7 +138,7 @@ namespace uGUI {
                     var first = _cellList.First.Value;
                     var last = _cellList.Last.Value.anchoredPosition;
 
-                    first.anchoredPosition = _isVertical ? new Vector2(last.x, last.y - _cellSize) : new Vector2(last.x + _cellSize, last.y);
+                    first.anchoredPosition = _isVertical ? new Vector2(last.x, last.y - cellRange) : new Vector2(last.x + cellRange, last.y);
 
                     _cellList.RemoveFirst();
                     _cellList.AddLast(first);
@@ -166,7 +173,7 @@ namespace uGUI {
                     var first = _cellList.First.Value.anchoredPosition;
                     var last = _cellList.Last.Value;
 
-                    last.anchoredPosition = _isVertical ? new Vector2(first.x, first.y + _cellSize) : new Vector2(first.x - _cellSize, first.y);
+                    last.anchoredPosition = _isVertical ? new Vector2(first.x, first.y + cellRange) : new Vector2(first.x - cellRange, first.y);
 
                     _cellList.RemoveLast();
                     _cellList.AddFirst(last);

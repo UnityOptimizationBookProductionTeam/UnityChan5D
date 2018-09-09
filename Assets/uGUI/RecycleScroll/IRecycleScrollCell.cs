@@ -1,6 +1,5 @@
 ﻿
 namespace uGUI {
-
     /// <summary>
     /// RecycleScrollContent用のセルのインターフェイス.
     /// セルの初期化と更新を実装する.
